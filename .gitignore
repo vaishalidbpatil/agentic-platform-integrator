@@ -1,0 +1,27 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio IDE files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code (keep .vscode/mcp.json — it's project config)
+.vscode/*
+!.vscode/mcp.json
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+
+# OS
+.DS_Store
+Thumbs.db

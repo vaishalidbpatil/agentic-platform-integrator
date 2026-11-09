@@ -1,0 +1,14 @@
+{
+	"servers": {
+		"weather": {
+			"type": "stdio",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"C:\\source\\MyConsoleMcp\\MyConsoleMcp.csproj"
+			]
+		}
+	},
+	"inputs": []
+}
