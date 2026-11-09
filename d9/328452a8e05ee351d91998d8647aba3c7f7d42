@@ -1,0 +1,35 @@
+mcp-architecture-diagram.html
+  s_9087812fafb1f5::t_31a2c8efd10050 1-396
+README.md
+  s_9087812fafb1f5::t_11baa1c74efe78 3-57
+.gitignore
+  s_9087812fafb1f5::t_fa7f19f8e3fdb9 1-27
+MyConsoleMcp/.vscode/mcp.json
+  s_9087812fafb1f5::t_9f8d9b8954d538 1-14
+MyConsoleMcp/HttpClientExt.cs
+  s_9087812fafb1f5::t_8fa3d32c965621 1-11
+MyConsoleMcp/MyConsoleMcp.csproj
+  s_9087812fafb1f5::t_63e61c26aa4d2a 1-15
+MyConsoleMcp/MyConsoleMcp.sln
+  s_9087812fafb1f5::t_bceadc7ab2e987 1-25
+MyConsoleMcp/Program.cs
+  s_9087812fafb1f5::t_94dd5dcf8742c8 1-45
+MyConsoleMcp/WeatherTools.cs
+  s_9087812fafb1f5::t_d3c388c1c6c548 1-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d9328452a8e05ee351d91998d8647aba3c7f7d42",
+  "prompts": {},
+  "sessions": {
+    "s_9087812fafb1f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e75cc8ab-245e-4e06-9974-8d4c04d777c6",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
