@@ -1,0 +1,22 @@
+Program.cs
+  s_54ea8a060c39de::t_c0ef7feaafdcbe 29-30
+  s_54ea8a060c39de::t_02aa41aa7714ab 31
+.mcp.json
+  s_54ea8a060c39de::t_b431e4bf8c61cc 9-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "87489a72799ae5225519c4c2e11facb8b71c18e9",
+  "prompts": {},
+  "sessions": {
+    "s_54ea8a060c39de": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e54c0853-b27c-4dbc-9db6-93a64dfcbcf4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
