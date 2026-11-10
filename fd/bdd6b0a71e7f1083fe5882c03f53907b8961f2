@@ -1,0 +1,19 @@
+MyConsoleMcp.csproj
+  s_54ea8a060c39de::t_f3ffbf35ee5937 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fdbdd6b0a71e7f1083fe5882c03f53907b8961f2",
+  "prompts": {},
+  "sessions": {
+    "s_54ea8a060c39de": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e54c0853-b27c-4dbc-9db6-93a64dfcbcf4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
