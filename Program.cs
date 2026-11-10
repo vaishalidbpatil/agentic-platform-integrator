@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
+Console.OutputEncoding = System.Text.Encoding.UTF8;
+
 var builder = Host.CreateEmptyApplicationBuilder(settings: null);
 builder.Logging.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
@@ -39,7 +41,7 @@ public class EchoTool(ILogger<EchoTool> logger)
     public string Echo(string message)
     {
         logger.LogInformation("Echo called with message={Message}", message);
-        var result = $"hello {message}";
+        var result = $"hello from Vaishali :  {message}";
         logger.LogInformation("Echo completed");
         return result;
     }
@@ -48,7 +50,7 @@ public class EchoTool(ILogger<EchoTool> logger)
     public string ReverseEcho(string message)
     {
         logger.LogInformation("ReverseEcho called with message={Message}", message);
-        var result = $"hello {new string(message.Reverse().ToArray())}";
+        var result = $"hello from Vaishali {new string(message.Reverse().ToArray())}";
         logger.LogInformation("ReverseEcho completed");
         return result;
     }

@@ -1,0 +1,14 @@
+{
+	"servers": {
+		"myTools": {
+			"type": "stdio",
+			"command": "dotnet",
+			"args": [
+				"run",
+                "--project",
+                "C:/source/PlatformDataIntegrator/MyConsoleMcp.csproj"
+			]
+		}
+	},
+	"inputs": []
+}
