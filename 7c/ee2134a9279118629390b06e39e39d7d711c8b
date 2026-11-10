@@ -1,0 +1,25 @@
+Program.cs
+  s_220f59a22db307::t_cf02bae51eaf1e 7
+  s_220f59a22db307::t_c602323727fa2f 24-32
+  s_220f59a22db307::t_96819c3b7ad482 36,39,48
+.mcp.json
+  s_220f59a22db307::t_286700ad109fc4 1-13
+WeatherTools.cs
+  s_220f59a22db307::t_8748fdbebdc8a4 10,13,43,51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7cee2134a9279118629390b06e39e39d7d711c8b",
+  "prompts": {},
+  "sessions": {
+    "s_220f59a22db307": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01142571-bd5e-4346-af41-0961ed095993",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
