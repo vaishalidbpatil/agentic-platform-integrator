@@ -6,7 +6,10 @@
 				"run",
 				"--project",
 				"C:/source/PlatformDataIntegrator/MyConsoleMcp.csproj"
-			]
+			],
+			"env": {
+				"DEBUG_MCP_SERVER": "1"
+			}
 		}
 	}
 }

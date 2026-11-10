@@ -26,10 +26,9 @@ var app = builder.Build();
 
 if (Environment.GetEnvironmentVariable("DEBUG_MCP_SERVER") == "1")
 {
-    Console.Error.WriteLine($"[MCP DEBUG] Waiting for debugger — PID={Environment.ProcessId}");
-    while (!Debugger.IsAttached)
-        Thread.Sleep(200);
-    Debugger.Break();
+    var pidFile = Path.Combine(AppContext.BaseDirectory, "mcp-debug.pid");
+    File.WriteAllText(pidFile, $"{Environment.ProcessId}");
+    Console.Error.WriteLine($"[MCP DEBUG] Waiting for debugger — PID={Environment.ProcessId} (written to {pidFile})");   
 }
 
 await app.RunAsync();
