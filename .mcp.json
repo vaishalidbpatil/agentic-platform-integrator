@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"mytools": {
+			"command": "dotnet",
+			"args": [
+				"C:/source/PlatformDataIntegrator/bin/Debug/net10.0/MyConsoleMcp.dll"
+			],
+			"env": {
+				"DEBUG_MCP_SERVER": "1"
+			}
+		}
+	}
+}

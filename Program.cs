@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 
 var builder = Host.CreateEmptyApplicationBuilder(settings: null);
@@ -20,13 +21,22 @@ builder.Services.AddSingleton(_ =>
     return client;
 });
 var app = builder.Build();
+
+if (Environment.GetEnvironmentVariable("DEBUG_MCP_SERVER") == "1")
+{
+    Console.Error.WriteLine($"[MCP DEBUG] Waiting for debugger — PID={Environment.ProcessId}");
+    while (!Debugger.IsAttached)
+        Thread.Sleep(200);
+    Debugger.Break();
+}
+
 await app.RunAsync();
 
 [McpServerToolType]
-public static class EchoTool
+public class EchoTool(ILogger<EchoTool> logger)
 {
     [McpServerTool, Description("Echoes the message back to the client.")]
-    public static string Echo(ILogger logger, string message)
+    public string Echo(string message)
     {
         logger.LogInformation("Echo called with message={Message}", message);
         var result = $"hello {message}";
@@ -35,7 +45,7 @@ public static class EchoTool
     }
 
     [McpServerTool, Description("Echoes the reverse message back to the client.")]
-    public static string ReverseEcho(ILogger logger, string message)
+    public string ReverseEcho(string message)
     {
         logger.LogInformation("ReverseEcho called with message={Message}", message);
         var result = $"hello {new string(message.Reverse().ToArray())}";
