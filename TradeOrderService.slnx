@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Portfolio.TradeOrderService.Api/Portfolio.TradeOrderService.Api.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.Client/Portfolio.TradeOrderService.Client.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.Configuration/Portfolio.TradeOrderService.Configuration.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.DataAccess/Portfolio.TradeOrderService.DataAccess.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.Database/Portfolio.TradeOrderService.Database.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.Models/Portfolio.TradeOrderService.Models.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.ServiceInterfaces/Portfolio.TradeOrderService.ServiceInterfaces.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.Services/Portfolio.TradeOrderService.Services.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.Sync/Portfolio.TradeOrderService.Sync.csproj" />
+  </Folder>
+</Solution>

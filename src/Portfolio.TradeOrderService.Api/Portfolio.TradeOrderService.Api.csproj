@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portfolio.TradeOrderService.Services\Portfolio.TradeOrderService.Services.csproj" />
+    <ProjectReference Include="..\Portfolio.TradeOrderService.ServiceInterfaces\Portfolio.TradeOrderService.ServiceInterfaces.csproj" />
+    <ProjectReference Include="..\Portfolio.TradeOrderService.Models\Portfolio.TradeOrderService.Models.csproj" />
+    <ProjectReference Include="..\Portfolio.TradeOrderService.Configuration\Portfolio.TradeOrderService.Configuration.csproj" />
+    <ProjectReference Include="..\Portfolio.TradeOrderService.DataAccess\Portfolio.TradeOrderService.DataAccess.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
