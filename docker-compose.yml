@@ -33,6 +33,15 @@ services:
       timeout: 5s
       retries: 5
 
+  auth:
+    build:
+      context: .
+      dockerfile: src/Portfolio.TradeOrderService.Auth/Dockerfile
+    container_name: portfolio-auth
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+
   api:
     build:
       context: .

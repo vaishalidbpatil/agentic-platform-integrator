@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auth Service — Trade Order Service</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+  nav .brand { font-weight: 700; color: #f0f6fc; font-size: 1rem; }
+  nav a { color: #8b949e; font-size: 0.875rem; }
+  nav a:hover { color: #c9d1d9; text-decoration: none; }
+
+  .hero { background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; padding: 3rem 2rem; }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero h1 { font-size: 2rem; color: #f0f6fc; margin-bottom: 0.5rem; }
+  .hero p { color: #8b949e; font-size: 1.1rem; }
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem; }
+  .badge-blue { background: #1f3a5f; color: #58a6ff; }
+  .badge-green { background: #1a3a2a; color: #3fb950; }
+  .badge-orange { background: #3a2a1a; color: #f0883e; }
+
+  main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+  section { margin-bottom: 3rem; }
+  h2 { font-size: 1.3rem; color: #f0f6fc; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #30363d; }
+  h3 { font-size: 1rem; color: #c9d1d9; margin: 1.25rem 0 0.5rem; }
+  p { margin-bottom: 0.75rem; color: #8b949e; }
+
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .card-title { font-weight: 600; color: #f0f6fc; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem 1.25rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; margin: 0.75rem 0; }
+  code { font-family: 'SFMono-Regular', Consolas, monospace; color: #e6edf3; }
+  pre code { color: #e6edf3; }
+  .kw { color: #ff7b72; }
+  .str { color: #a5d6ff; }
+  .cmt { color: #8b949e; font-style: italic; }
+  .prop { color: #79c0ff; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { background: #161b22; color: #8b949e; font-weight: 600; text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid #30363d; }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid #21262d; color: #c9d1d9; }
+  tr:last-child td { border-bottom: none; }
+
+  .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
+  .flow-box { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.4rem 0.9rem; font-size: 0.85rem; color: #c9d1d9; }
+  .flow-box.accent { border-color: #58a6ff; color: #58a6ff; }
+  .flow-box.green { border-color: #3fb950; color: #3fb950; }
+  .flow-arrow { color: #8b949e; font-size: 1rem; }
+
+  .endpoint-pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; font-family: monospace; margin-right: 0.4rem; }
+  .pill-post { background: #1a3a2a; color: #3fb950; }
+  .pill-get  { background: #1f3a5f; color: #58a6ff; }
+
+  .note { background: #1f3a5f22; border-left: 3px solid #58a6ff; border-radius: 0 6px 6px 0; padding: 0.75rem 1rem; margin: 1rem 0; color: #8b949e; font-size: 0.875rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">Trade Order Service</span>
+  <a href="index.html">Home</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="api.html">API Reference</a>
+  <a href="auth.html" style="color:#c9d1d9">Auth Service</a>
+  <a href="database.html">Database</a>
+  <a href="local-dev.html">Local Dev</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Auth Service <span class="badge badge-blue">OAuth 2.0</span> <span class="badge badge-green">OIDC</span></h1>
+    <p>Standalone identity server powered by Duende IdentityServer 8. Issues JWTs for machine-to-machine and browser clients.</p>
+  </div>
+</div>
+
+<main>
+
+  <section>
+    <h2>Overview</h2>
+    <p>Auth.Service is a containerised OAuth 2.0 / OpenID Connect token server. It has no login UI — it is a pure token issuer for service-to-service (client credentials) flows and will back the browser dashboard via PKCE (authorization code).</p>
+    <div class="flow">
+      <div class="flow-box accent">Client</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">POST /connect/token</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box green">Auth.Service :5001</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">JWT (access_token)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box accent">Orders API :8080</div>
+    </div>
+    <div class="note">Discovery document: <code>http://localhost:5001/.well-known/openid-configuration</code><br>JWKS: <code>http://localhost:5001/.well-known/openid-configuration/jwks</code></div>
+  </section>
+
+  <section>
+    <h2>Scopes &amp; Resources</h2>
+    <table>
+      <tr><th>Scope</th><th>Description</th></tr>
+      <tr><td><code>orders.read</code></td><td>Read trade orders (GET endpoints)</td></tr>
+      <tr><td><code>orders.write</code></td><td>Submit trade orders (POST endpoints)</td></tr>
+      <tr><td><code>openid</code></td><td>OpenID Connect identity token</td></tr>
+      <tr><td><code>profile</code></td><td>Standard profile claims</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Registered Clients</h2>
+
+    <div class="card">
+      <div class="card-title">orders-api-client <span class="badge badge-orange">client_credentials</span></div>
+      <p>Machine-to-machine client for the Orders API service calling downstream services.</p>
+      <table>
+        <tr><th>Setting</th><th>Value</th></tr>
+        <tr><td>Client ID</td><td><code>orders-api-client</code></td></tr>
+        <tr><td>Client Secret</td><td><code>orders-api-secret</code></td></tr>
+        <tr><td>Allowed Scopes</td><td><code>orders.read</code> <code>orders.write</code></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">sync-worker <span class="badge badge-orange">client_credentials</span></div>
+      <p>Machine-to-machine client for the Outbox Relay worker.</p>
+      <table>
+        <tr><th>Setting</th><th>Value</th></tr>
+        <tr><td>Client ID</td><td><code>sync-worker</code></td></tr>
+        <tr><td>Client Secret</td><td><code>sync-worker-secret</code></td></tr>
+        <tr><td>Allowed Scopes</td><td><code>orders.read</code></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">dashboard <span class="badge badge-blue">authorization_code + PKCE</span></div>
+      <p>Public browser client for the Trade Order Dashboard. No client secret — PKCE required.</p>
+      <table>
+        <tr><th>Setting</th><th>Value</th></tr>
+        <tr><td>Client ID</td><td><code>dashboard</code></td></tr>
+        <tr><td>Redirect URI</td><td><code>http://localhost:3000/callback</code></td></tr>
+        <tr><td>Allowed Scopes</td><td><code>openid</code> <code>profile</code> <code>orders.read</code></td></tr>
+        <tr><td>PKCE Required</td><td>Yes</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Getting a Token (client_credentials)</h2>
+    <p>Use this to call the Orders API from a script or test:</p>
+    <pre><code><span class="cmt"># Request a token</span>
+curl -X POST http://localhost:5001/connect/token \
+  -H <span class="str">"Content-Type: application/x-www-form-urlencoded"</span> \
+  -d <span class="str">"grant_type=client_credentials&amp;client_id=orders-api-client&amp;client_secret=orders-api-secret&amp;scope=orders.read%20orders.write"</span>
+
+<span class="cmt"># Response</span>
+{
+  <span class="prop">"access_token"</span>: <span class="str">"eyJhbGci..."</span>,
+  <span class="prop">"expires_in"</span>: 3600,
+  <span class="prop">"token_type"</span>: <span class="str">"Bearer"</span>,
+  <span class="prop">"scope"</span>: <span class="str">"orders.read orders.write"</span>
+}
+
+<span class="cmt"># Use the token</span>
+curl http://localhost:8080/v1/orders \
+  -H <span class="str">"Authorization: Bearer eyJhbGci..."</span></code></pre>
+  </section>
+
+  <section>
+    <h2>Signing Credential</h2>
+    <p>In development, Auth.Service uses <code>.AddDeveloperSigningCredential()</code> — a temporary RSA key written to disk on first start. This is fine for local development and demos.</p>
+    <div class="note"><strong>Production:</strong> Replace with an X.509 certificate loaded from a secret store (Azure Key Vault, AWS Secrets Manager, Kubernetes secret). Never ship developer signing credentials to production.</div>
+  </section>
+
+  <section>
+    <h2>Key Endpoints</h2>
+    <table>
+      <tr><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="endpoint-pill pill-get">GET</span> <code>/.well-known/openid-configuration</code></td><td>OIDC discovery document — lists all supported endpoints and algorithms</td></tr>
+      <tr><td><span class="endpoint-pill pill-get">GET</span> <code>/.well-known/openid-configuration/jwks</code></td><td>Public key set — used by resource servers to verify token signatures</td></tr>
+      <tr><td><span class="endpoint-pill pill-post">POST</span> <code>/connect/token</code></td><td>Token endpoint — issues access tokens and ID tokens</td></tr>
+      <tr><td><span class="endpoint-pill pill-get">GET</span> <code>/connect/authorize</code></td><td>Authorization endpoint — used by browser clients (PKCE flow)</td></tr>
+      <tr><td><span class="endpoint-pill pill-get">GET</span> <code>/health/live</code></td><td>Liveness probe</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>What's Next</h2>
+    <p>Once Auth.Service is running, task #14 wires JWT Bearer validation into the Orders API so all endpoints require a valid token with the right scope.</p>
+    <div class="flow">
+      <div class="flow-box green">Auth.Service issues JWT ✓</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box accent">Orders API validates JWT (#14)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">Dashboard PKCE login (#22)</div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
