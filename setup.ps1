@@ -1,11 +1,24 @@
 Write-Host "=== Trade Order Service Setup ===" -ForegroundColor Cyan
 
-# Step 1 - Tear down existing containers and volumes for a clean slate
-Write-Host "`nTearing down existing containers and volumes..." -ForegroundColor Yellow
-docker compose down -v
+# Step 1 - Tear down everything: containers, orphans, and volumes
+Write-Host "`nTearing down containers and volumes..." -ForegroundColor Yellow
+docker compose down --remove-orphans -v
 if ($LASTEXITCODE -ne 0) {
     Write-Host "docker compose down failed." -ForegroundColor Red
     exit 1
+}
+
+# Belt-and-suspenders: force-remove the volume if it still exists
+$volumeName = "agentic-platform-integrator_postgres_data"
+$volumeExists = docker volume ls --format "{{.Name}}" | Select-String -Quiet $volumeName
+if ($volumeExists) {
+    Write-Host "Force-removing leftover volume: $volumeName" -ForegroundColor Yellow
+    # Find and kill any container still holding the volume
+    $holdingContainers = docker ps -aq --filter "volume=$volumeName"
+    if ($holdingContainers) {
+        docker rm -f $holdingContainers | Out-Null
+    }
+    docker volume rm $volumeName | Out-Null
 }
 
 # Step 2 - Start Postgres first and wait for it to be healthy
@@ -40,14 +53,9 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Step 4 - Tail API logs briefly to confirm startup and migrations
-Write-Host "`nAPI startup logs (10s):" -ForegroundColor Yellow
-$timeout = 10
-$elapsed = 0
-while ($elapsed -lt $timeout) {
-    Start-Sleep -Seconds 1
-    $elapsed++
-}
+# Step 4 - Wait and show API startup logs
+Write-Host "`nWaiting for API to start (10s)..." -ForegroundColor Yellow
+Start-Sleep -Seconds 10
 docker compose logs api --tail 30
 
 Write-Host "`nSetup complete." -ForegroundColor Cyan
