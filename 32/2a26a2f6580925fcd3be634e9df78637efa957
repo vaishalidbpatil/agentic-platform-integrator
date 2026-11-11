@@ -1,0 +1,61 @@
+TradeOrderService.slnx
+  s_2897319b1316f8::t_40b12ba5e22d25 8
+src/Portfolio.TradeOrderService.Database/Portfolio.TradeOrderService.Database.csproj
+  s_2897319b1316f8::t_9076d70a1cd0ba 3-10
+  s_2897319b1316f8::t_f607cf771fbefc 17-20
+src/Portfolio.TradeOrderService.Database/MigrationRunner.cs
+  s_2897319b1316f8::t_8836672735dc81 1-87
+src/Portfolio.TradeOrderService.McpServer/Portfolio.TradeOrderService.McpServer.http
+  s_2897319b1316f8::t_40b12ba5e22d25 1-6
+src/Portfolio.TradeOrderService.Database/Migrations/004_create_audit_log.sql
+  s_2897319b1316f8::t_7bc8445a10ae04 1-11
+README.md
+  s_2897319b1316f8::t_666fcc86cbde18 95,98,105-107,111
+  s_2897319b1316f8::t_6552a4d189c8d5 50-51,56,67,72,88
+"src/Portfolio.TradeOrderService.Database/Migrationscp Csourceagentic-platform-integratordbmigrations002_create_outbox.sql Csourceagentic-platform-integratorsrcPortfolio.TradeOrderService.DatabaseMigrations"
+  s_2897319b1316f8::t_a3c4e5d3489a89 1-18
+src/Portfolio.TradeOrderService.McpServer/appsettings.json
+  s_2897319b1316f8::t_40b12ba5e22d25 1-9
+src/Portfolio.TradeOrderService.McpServer/Tools/WeatherTool.cs
+  s_2897319b1316f8::t_ad970419be79e8 1-34
+src/Portfolio.TradeOrderService.Database/Migrations/003_create_ingestion_jobs.sql
+  s_2897319b1316f8::t_7bc8445a10ae04 1-15
+src/Portfolio.TradeOrderService.McpServer/Portfolio.TradeOrderService.McpServer.csproj
+  s_2897319b1316f8::t_40b12ba5e22d25 1-9
+src/Portfolio.TradeOrderService.Api/appsettings.json
+  s_2897319b1316f8::t_21d0ba3ace7468 8-11
+src/Portfolio.TradeOrderService.Database/Migrations/002_create_outbox.sql
+  s_2897319b1316f8::t_7bc8445a10ae04 1-14
+src/Portfolio.TradeOrderService.McpServer/Properties/launchSettings.json
+  s_2897319b1316f8::t_40b12ba5e22d25 1-23
+src/Portfolio.TradeOrderService.McpServer/appsettings.Development.json
+  s_2897319b1316f8::t_40b12ba5e22d25 2-7
+src/Portfolio.TradeOrderService.Database/Migrations/001_create_orders.sql
+  s_2897319b1316f8::t_7bc8445a10ae04 1-18
+src/Portfolio.TradeOrderService.Api/Program.cs
+  s_2897319b1316f8::t_774740cff7428e 1-3,6-7,9-12,14-15,17,19-20,22-24,26-27,29-30,32
+src/Portfolio.TradeOrderService.Configuration/DatabaseOptions.cs
+  s_2897319b1316f8::t_a271a9c91c578a 1,3,5-6
+"src/Portfolio.TradeOrderService.Database/Migrationscp Csourceagentic-platform-integratordbmigrations004_create_audit_log.sql Csourceagentic-platform-integratorsrcPortfolio.TradeOrderService.DatabaseMigrations"
+  s_2897319b1316f8::t_a3c4e5d3489a89 1-15
+src/Portfolio.TradeOrderService.McpServer/Program.cs
+  s_2897319b1316f8::t_14305b6921901a 1-13
+src/Portfolio.TradeOrderService.Api/Portfolio.TradeOrderService.Api.csproj
+  s_2897319b1316f8::t_bc97dbf89a2b7e 11-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "322a26a2f6580925fcd3be634e9df78637efa957",
+  "prompts": {},
+  "sessions": {
+    "s_2897319b1316f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "125ae5a3-03b1-4e8b-97a1-9298d99cd8b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
