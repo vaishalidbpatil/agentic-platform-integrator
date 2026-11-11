@@ -1,0 +1,36 @@
+src/Portfolio.TradeOrderService.Auth/Program.cs
+  s_2897319b1316f8::t_aefbd815a96c8d 1-23
+src/Portfolio.TradeOrderService.Auth/Properties/launchSettings.json
+  s_2897319b1316f8::t_b00378a8754c12 1-23
+src/Portfolio.TradeOrderService.Auth/appsettings.json
+  s_2897319b1316f8::t_b925396445fca3 1-9
+src/Portfolio.TradeOrderService.Auth/Config.cs
+  s_2897319b1316f8::t_6f68b197c8d930 1-63
+src/Portfolio.TradeOrderService.Auth/Portfolio.TradeOrderService.Auth.csproj
+  s_2897319b1316f8::t_5ab17e9db8589c 9-12
+  s_2897319b1316f8::t_b00378a8754c12 1-8,13
+docker-compose.yml
+  s_2897319b1316f8::t_1b21a56ae35473 36-44
+docs/auth.html
+  s_2897319b1316f8::t_244131e4cd2c00 1-202
+src/Portfolio.TradeOrderService.Auth/appsettings.Development.json
+  s_2897319b1316f8::t_b00378a8754c12 1-8
+src/Portfolio.TradeOrderService.Auth/Dockerfile
+  s_2897319b1316f8::t_ea8e9dcdf8cc92 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "85d08723769d466f7518722d8b33c3d29821ff58",
+  "prompts": {},
+  "sessions": {
+    "s_2897319b1316f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "125ae5a3-03b1-4e8b-97a1-9298d99cd8b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
