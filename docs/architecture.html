@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — Trade Order Service</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+  nav .brand { font-weight: 700; font-size: 1rem; color: #f0f6fc; }
+  nav .nav-links { display: flex; gap: 1.5rem; }
+  nav .nav-links a { font-size: 0.875rem; color: #8b949e; }
+  nav .nav-links a:hover { color: #c9d1d9; text-decoration: none; }
+  nav .nav-links a.active { color: #f0f6fc; }
+
+  .page-header { padding: 2.5rem 2rem 2rem; border-bottom: 1px solid #30363d; background: #161b22; }
+  .page-header h1 { font-size: 2rem; font-weight: 700; color: #f0f6fc; }
+  .page-header p { color: #8b949e; margin-top: 0.5rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+  .section { margin-bottom: 3.5rem; }
+  .section h2 { font-size: 1.375rem; font-weight: 600; color: #f0f6fc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid #30363d; }
+  .section h3 { font-size: 1rem; font-weight: 600; color: #c9d1d9; margin: 1.5rem 0 0.75rem; }
+
+  /* System diagram */
+  .diagram { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 2rem; overflow-x: auto; }
+  .diagram-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .diagram-row:last-child { margin-bottom: 0; }
+  .box { display: inline-flex; align-items: center; padding: 0.4rem 0.875rem; border-radius: 5px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+  .box-blue { background: #1f3a5f; color: #58a6ff; border: 1px solid #1f6feb; }
+  .box-green { background: #1a3a2a; color: #3fb950; border: 1px solid #2ea043; }
+  .box-orange { background: #3d2b1a; color: #f0883e; border: 1px solid #d1620a; }
+  .box-purple { background: #2d1f4e; color: #bc8cff; border: 1px solid #6e40c9; }
+  .box-gray { background: #21262d; color: #8b949e; border: 1px solid #30363d; }
+  .arrow { color: #484f58; font-size: 1.1rem; }
+  .diagram-divider { border-top: 1px dashed #30363d; margin: 1rem 0; }
+  .diagram-label { font-size: 0.7rem; color: #484f58; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+
+  /* Project table */
+  .proj-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .proj-table th { background: #161b22; padding: 0.625rem 1rem; text-align: left; color: #8b949e; border: 1px solid #30363d; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .proj-table td { padding: 0.75rem 1rem; border: 1px solid #30363d; vertical-align: top; }
+  .proj-table tr:hover td { background: #161b22; }
+  .proj-name { font-family: 'SFMono-Regular', Consolas, monospace; color: #58a6ff; font-size: 0.8rem; }
+
+  /* Dependency flow */
+  .dep-flow { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 2rem; }
+  .dep-row { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .dep-arrow { display: flex; justify-content: center; color: #484f58; font-size: 1.25rem; margin-bottom: 0.75rem; }
+  .dep-box { display: inline-flex; align-items: center; padding: 0.4rem 0.875rem; border-radius: 5px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.75rem; font-weight: 600; }
+  .dep-inner { background: #1a3a2a; color: #3fb950; border: 1px solid #2ea043; }
+  .dep-mid { background: #1f3a5f; color: #58a6ff; border: 1px solid #1f6feb; }
+  .dep-outer { background: #3d2b1a; color: #f0883e; border: 1px solid #d1620a; }
+  .dep-note { text-align: center; font-size: 0.8rem; color: #8b949e; margin-top: 1rem; }
+
+  footer { text-align: center; padding: 2rem; border-top: 1px solid #30363d; color: #484f58; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ Trade Order Service</span>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="architecture.html" class="active">Architecture</a>
+    <a href="api.html">API Reference</a>
+    <a href="database.html">Database & Outbox</a>
+    <a href="local-dev.html">Local Dev</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Architecture</h1>
+  <p>System topology, project structure, and dependency flow.</p>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <h2>System diagram</h2>
+    <div class="diagram">
+      <div class="diagram-label">Client layer</div>
+      <div class="diagram-row">
+        <span class="box box-purple">Dashboard (Browser)</span>
+        <span class="arrow">→</span>
+        <span class="box box-orange">Auth.Service (OAuth2)</span>
+        <span class="arrow">→</span>
+        <span class="box box-blue">Orders API /v1</span>
+      </div>
+
+      <div class="diagram-divider"></div>
+      <div class="diagram-label">Data layer</div>
+      <div class="diagram-row">
+        <span class="box box-blue">Orders API</span>
+        <span class="arrow">→</span>
+        <span class="box box-green">PostgreSQL 16</span>
+        <span class="arrow" style="margin-left:1rem">outbox table</span>
+        <span class="arrow">→</span>
+        <span class="box box-gray">Sync (Relay)</span>
+        <span class="arrow">→</span>
+        <span class="box box-orange">RabbitMQ</span>
+        <span class="arrow">→</span>
+        <span class="box box-blue">Order Worker</span>
+      </div>
+
+      <div class="diagram-divider"></div>
+      <div class="diagram-label">Ingestion layer</div>
+      <div class="diagram-row">
+        <span class="box box-purple">Python Data-Quality CLI</span>
+        <span class="arrow">↔</span>
+        <span class="box box-orange">S3 Bucket</span>
+        <span class="arrow">→</span>
+        <span class="box box-gray">Ingestion Framework</span>
+        <span class="arrow">→</span>
+        <span class="box box-green">PostgreSQL 16</span>
+      </div>
+
+      <div class="diagram-divider"></div>
+      <div class="diagram-label">Platform layer</div>
+      <div class="diagram-row">
+        <span class="box box-purple">MCP Server (4 tools)</span>
+        <span class="arrow" style="margin-left:1.5rem">|</span>
+        <span class="box box-gray">Consul (Service Discovery)</span>
+        <span class="arrow" style="margin-left:1.5rem">|</span>
+        <span class="box box-blue">OpenTelemetry</span>
+        <span class="arrow">→</span>
+        <span class="box box-orange">Prometheus</span>
+        <span class="arrow">→</span>
+        <span class="box box-green">Grafana</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Project structure</h2>
+    <p style="margin-bottom:1rem; color:#8b949e; font-size:0.875rem;">Nine projects across a layered .NET 10 solution. Dependencies only flow inward — outer layers never reference inner layers.</p>
+    <table class="proj-table">
+      <thead>
+        <tr><th>Project</th><th>Responsibility</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="proj-name">Api</span></td>
+          <td>ASP.NET Core host. Controllers, middleware, DI registration, health endpoints, rate limiting, Swagger. Entry point for all HTTP traffic.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">McpServer</span></td>
+          <td>Standalone MCP tool server exposing 4 tools: <code>get_order_status</code>, <code>list_recent_orders</code>, <code>get_data_quality_report</code>, <code>replay_dead_letter_message</code>. Read-only by default with an approval gate and full audit log.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">ServiceInterfaces</span></td>
+          <td>Contracts only — <code>IOrderService</code>, <code>IIngestionService</code>, etc. No implementations. Allows the Api to depend on abstractions without coupling to business logic.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">Services</span></td>
+          <td>Implementations of service interfaces. Contains all business logic: order validation, idempotency checks, status transitions.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">Sync</span></td>
+          <td>Background service that polls the outbox table for PENDING events and publishes them to RabbitMQ. Decouples DB writes from message publishing. Marks events SENT on success, increments attempts on failure.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">Models</span></td>
+          <td>Shared domain models (<code>Order</code>, <code>OrderSide</code>, <code>OrderStatus</code>), DTOs, enums, and request/response contracts. No external dependencies.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">Database</span></td>
+          <td>Migration runner and embedded SQL schema files. Loads <code>*.sql</code> files as assembly resources, runs unapplied ones in order, tracks applied migrations in a <code>__migrations</code> table.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">DataAccess</span></td>
+          <td>Repository implementations (<code>OrderRepository</code>). All SQL lives here — raw Npgsql, no ORM. The outbox event insert happens atomically in the same transaction as the order insert.</td>
+        </tr>
+        <tr>
+          <td><span class="proj-name">Configuration</span></td>
+          <td>Strongly-typed option classes (<code>DatabaseOptions</code>, <code>RabbitMqOptions</code>, <code>S3Options</code>). Bound from <code>appsettings.json</code> at startup.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Dependency flow</h2>
+    <div class="dep-flow">
+      <div class="dep-row">
+        <span class="dep-box dep-inner">Models</span>
+        <span class="dep-box dep-inner">Configuration</span>
+      </div>
+      <div class="dep-arrow">↓</div>
+      <div class="dep-row">
+        <span class="dep-box dep-mid">Database</span>
+        <span class="dep-box dep-mid">DataAccess</span>
+      </div>
+      <div class="dep-arrow">↓</div>
+      <div class="dep-row">
+        <span class="dep-box dep-mid">ServiceInterfaces</span>
+        <span class="dep-box dep-mid">Services</span>
+      </div>
+      <div class="dep-arrow">↓</div>
+      <div class="dep-row">
+        <span class="dep-box dep-outer">Api</span>
+        <span class="dep-box dep-outer">Sync</span>
+        <span class="dep-box dep-outer">Client</span>
+        <span class="dep-box dep-outer">McpServer</span>
+      </div>
+      <p class="dep-note">Inner layers (green → blue) never reference outer layers (orange). Outer layers wire everything together via DI.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>Trade Order Service — Portfolio Project</footer>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade Order Service</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+  nav .brand { font-weight: 700; font-size: 1rem; color: #f0f6fc; }
+  nav .nav-links { display: flex; gap: 1.5rem; }
+  nav .nav-links a { font-size: 0.875rem; color: #8b949e; }
+  nav .nav-links a:hover { color: #c9d1d9; text-decoration: none; }
+  nav .nav-links a.active { color: #f0f6fc; }
+
+  .hero { padding: 5rem 2rem 4rem; text-align: center; border-bottom: 1px solid #30363d; background: linear-gradient(180deg, #161b22 0%, #0d1117 100%); }
+  .hero h1 { font-size: 3rem; font-weight: 700; color: #f0f6fc; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .hero p { font-size: 1.25rem; color: #8b949e; max-width: 600px; margin: 0 auto 2rem; }
+  .hero-badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 600; }
+  .badge-blue { background: #1f3a5f; color: #58a6ff; border: 1px solid #1f6feb; }
+  .badge-green { background: #1a3a2a; color: #3fb950; border: 1px solid #2ea043; }
+  .badge-orange { background: #3d2b1a; color: #f0883e; border: 1px solid #d1620a; }
+  .badge-purple { background: #2d1f4e; color: #bc8cff; border: 1px solid #6e40c9; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 4rem; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+  .card:hover { border-color: #58a6ff; transform: translateY(-2px); }
+  .card .card-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+  .card h3 { font-size: 1rem; font-weight: 600; color: #f0f6fc; margin-bottom: 0.5rem; }
+  .card p { font-size: 0.875rem; color: #8b949e; }
+  .card a.card-link { display: block; margin-top: 1rem; font-size: 0.875rem; color: #58a6ff; }
+
+  .section { margin-bottom: 3rem; }
+  .section h2 { font-size: 1.375rem; font-weight: 600; color: #f0f6fc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid #30363d; }
+
+  .feature-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem; }
+  .feature-list li { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.875rem 1rem; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 0.625rem; }
+  .feature-list li::before { content: "✓"; color: #3fb950; font-weight: 700; flex-shrink: 0; margin-top: 0.05rem; }
+
+  .phase-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .phase-table th { background: #161b22; padding: 0.625rem 1rem; text-align: left; color: #8b949e; border: 1px solid #30363d; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .phase-table td { padding: 0.625rem 1rem; border: 1px solid #30363d; vertical-align: middle; }
+  .phase-table tr:hover td { background: #161b22; }
+  .status-done { color: #3fb950; font-weight: 600; }
+  .status-wip { color: #f0883e; font-weight: 600; }
+  .status-todo { color: #8b949e; }
+
+  footer { text-align: center; padding: 2rem; border-top: 1px solid #30363d; color: #484f58; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ Trade Order Service</span>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="api.html">API Reference</a>
+    <a href="database.html">Database & Outbox</a>
+    <a href="local-dev.html">Local Dev</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Trade Order Service</h1>
+  <p>A production-style financial order processing system built as a portfolio project to demonstrate senior engineering skills.</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">.NET 10</span>
+    <span class="badge badge-blue">ASP.NET Core</span>
+    <span class="badge badge-green">PostgreSQL 16</span>
+    <span class="badge badge-orange">RabbitMQ</span>
+    <span class="badge badge-blue">Docker</span>
+    <span class="badge badge-purple">Kubernetes</span>
+    <span class="badge badge-orange">OpenTelemetry</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <h3>Architecture</h3>
+      <p>System design, service topology, project structure, and dependency flow.</p>
+      <a href="architecture.html" class="card-link">View architecture →</a>
+    </div>
+    <div class="card">
+      <div class="card-icon">📡</div>
+      <h3>API Reference</h3>
+      <p>All endpoints, request/response shapes, headers, and idempotency behaviour.</p>
+      <a href="api.html" class="card-link">View API docs →</a>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗄️</div>
+      <h3>Database & Outbox</h3>
+      <p>Migration system, schema, and the transactional outbox pattern explained.</p>
+      <a href="database.html" class="card-link">View database docs →</a>
+    </div>
+    <div class="card">
+      <div class="card-icon">💻</div>
+      <h3>Local Dev</h3>
+      <p>Prerequisites, setup script walkthrough, Swagger, and common error fixes.</p>
+      <a href="local-dev.html" class="card-link">View dev guide →</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>What this project demonstrates</h2>
+    <ul class="feature-list">
+      <li>OpenAPI-first REST API with versioned routes and idempotency keys</li>
+      <li>Transactional Outbox Pattern for reliable event publishing</li>
+      <li>Layered .NET 10 architecture across 9 projects</li>
+      <li>Repository pattern with raw Npgsql (no ORM)</li>
+      <li>Embedded SQL migrations with automatic tracking</li>
+      <li>Multi-stage Dockerfile with non-root runtime user</li>
+      <li>Docker Compose local dev environment</li>
+      <li>Kubernetes + Helm deployment manifests</li>
+      <li>OAuth2 / OIDC with Auth.Service</li>
+      <li>MCP Server with 4 tools, audit log, and approval gate</li>
+      <li>Python data-quality CLI with pluggable adapters</li>
+      <li>OpenTelemetry → Prometheus → Grafana observability</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Project phases</h2>
+    <table class="phase-table">
+      <thead>
+        <tr><th>Phase</th><th>Focus</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Orders API, PostgreSQL, Outbox, RabbitMQ, Order Worker, Polly retries</td><td class="status-wip">In progress</td></tr>
+        <tr><td>2</td><td>Auth.Service, Rate limiting, OpenAPI spec, CI validation, Python data-quality</td><td class="status-todo">Planned</td></tr>
+        <tr><td>3</td><td>MCP Server (4 tools, guardrails, audit log), Dashboard with PKCE</td><td class="status-todo">Planned</td></tr>
+        <tr><td>4</td><td>Kubernetes + Helm, Consul, AWS S3/EC2, GitHub Actions CI/CD</td><td class="status-todo">Planned</td></tr>
+        <tr><td>5</td><td>Serilog, OpenTelemetry, Grafana dashboard, RUNBOOK.md</td><td class="status-todo">Planned</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>Trade Order Service — Portfolio Project</footer>
+
+</body>
+</html>

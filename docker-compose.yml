@@ -17,6 +17,22 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: portfolio-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: .
@@ -29,6 +45,24 @@ services:
       Database__ConnectionString: "Host=postgres;Port=5432;Database=tradeorders;Username=admin;Password=admin123"
     depends_on:
       postgres:
+        condition: service_healthy
+
+  sync:
+    build:
+      context: .
+      dockerfile: src/Portfolio.TradeOrderService.Sync/Dockerfile
+    container_name: portfolio-sync
+    restart: unless-stopped
+    environment:
+      Database__ConnectionString: "Host=postgres;Port=5432;Database=tradeorders;Username=admin;Password=admin123"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
 volumes:

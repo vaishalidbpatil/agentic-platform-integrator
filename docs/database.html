@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Database & Outbox — Trade Order Service</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SFMono-Regular', Consolas, monospace; background: #161b22; padding: 0.1rem 0.35rem; border-radius: 3px; border: 1px solid #30363d; font-size: 0.85em; }
+
+  nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+  nav .brand { font-weight: 700; font-size: 1rem; color: #f0f6fc; }
+  nav .nav-links { display: flex; gap: 1.5rem; }
+  nav .nav-links a { font-size: 0.875rem; color: #8b949e; }
+  nav .nav-links a:hover { color: #c9d1d9; text-decoration: none; }
+  nav .nav-links a.active { color: #f0f6fc; }
+
+  .page-header { padding: 2.5rem 2rem 2rem; border-bottom: 1px solid #30363d; background: #161b22; }
+  .page-header h1 { font-size: 2rem; font-weight: 700; color: #f0f6fc; }
+  .page-header p { color: #8b949e; margin-top: 0.5rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+  .section { margin-bottom: 3.5rem; }
+  .section > h2 { font-size: 1.375rem; font-weight: 600; color: #f0f6fc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid #30363d; }
+  .section h3 { font-size: 1rem; font-weight: 600; color: #c9d1d9; margin: 1.5rem 0 0.75rem; }
+
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; font-size: 0.8rem; overflow-x: auto; color: #c9d1d9; font-family: 'SFMono-Regular', Consolas, monospace; white-space: pre; margin: 0.75rem 0; }
+  .kw { color: #ff7b72; }
+  .typ { color: #79c0ff; }
+  .cmt { color: #484f58; }
+  .str { color: #a5d6ff; }
+
+  .migration-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .migration-list li { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 1rem; }
+  .migration-list li .num { font-family: 'SFMono-Regular', Consolas, monospace; color: #3fb950; font-size: 0.85rem; font-weight: 700; min-width: 3.5rem; }
+  .migration-list li .name { font-family: 'SFMono-Regular', Consolas, monospace; color: #58a6ff; font-size: 0.85rem; }
+  .migration-list li .desc { color: #8b949e; font-size: 0.875rem; margin-left: auto; }
+
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 1rem; }
+  .step-line { display: flex; flex-direction: column; align-items: center; }
+  .step-dot { width: 32px; height: 32px; border-radius: 50%; background: #1f3a5f; border: 2px solid #58a6ff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #58a6ff; flex-shrink: 0; }
+  .step-connector { width: 2px; background: #30363d; flex: 1; min-height: 20px; margin: 4px 0; }
+  .step-content { padding: 0 0 1.5rem 0; flex: 1; }
+  .step-content h4 { font-size: 0.95rem; font-weight: 600; color: #f0f6fc; margin-bottom: 0.4rem; padding-top: 0.4rem; }
+  .step-content p { font-size: 0.875rem; color: #8b949e; }
+
+  /* Outbox flow diagram */
+  .outbox-flow { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 2rem; }
+  .flow-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .flow-box { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+  .flow-db { background: #1a3a2a; color: #3fb950; border: 1px solid #2ea043; }
+  .flow-api { background: #1f3a5f; color: #58a6ff; border: 1px solid #1f6feb; }
+  .flow-rabbit { background: #3d2b1a; color: #f0883e; border: 1px solid #d1620a; }
+  .flow-worker { background: #2d1f4e; color: #bc8cff; border: 1px solid #6e40c9; }
+  .flow-arrow { color: #484f58; font-size: 1.1rem; }
+  .flow-label { font-size: 0.7rem; color: #484f58; text-transform: uppercase; letter-spacing: 0.08em; }
+  .tx-box { background: #0d1117; border: 2px dashed #3fb950; border-radius: 8px; padding: 1rem; margin: 0.75rem 0; display: inline-flex; flex-direction: column; gap: 0.5rem; }
+  .tx-label { font-size: 0.7rem; color: #3fb950; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+
+  .table-schema { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 0.75rem; }
+  .table-schema th { background: #0d1117; padding: 0.5rem 0.875rem; text-align: left; color: #8b949e; border: 1px solid #30363d; font-weight: 600; }
+  .table-schema td { padding: 0.5rem 0.875rem; border: 1px solid #30363d; font-family: 'SFMono-Regular', Consolas, monospace; color: #c9d1d9; }
+  .table-schema td.desc { font-family: inherit; color: #8b949e; }
+  .pk { color: #f0883e; font-weight: 700; }
+
+  .callout-green { background: #1a3a2a; border-left: 3px solid #3fb950; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; font-size: 0.875rem; color: #c9d1d9; margin: 1rem 0; }
+  .callout-green strong { color: #3fb950; }
+
+  footer { text-align: center; padding: 2rem; border-top: 1px solid #30363d; color: #484f58; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ Trade Order Service</span>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="api.html">API Reference</a>
+    <a href="database.html" class="active">Database & Outbox</a>
+    <a href="local-dev.html">Local Dev</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Database &amp; Outbox</h1>
+  <p>Migration system, schema reference, and the transactional outbox pattern.</p>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <h2>Migration system</h2>
+    <p style="margin-bottom:1rem;color:#8b949e;font-size:0.875rem;">Migrations are plain SQL files embedded as assembly resources inside the <code>Portfolio.TradeOrderService.Database</code> project. The <code>MigrationRunner</code> runs automatically on API startup.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"><div class="step-dot">1</div><div class="step-connector"></div></div>
+        <div class="step-content">
+          <h4>Create <code>__migrations</code> table (if not exists)</h4>
+          <p>Tracks which migrations have already been applied. Created with <code>IF NOT EXISTS</code> so it's safe to run repeatedly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-dot">2</div><div class="step-connector"></div></div>
+        <div class="step-content">
+          <h4>Load embedded SQL files via reflection</h4>
+          <p>Uses <code>Assembly.GetManifestResourceNames()</code> to find all <code>.sql</code> files, sorted by filename so they run in numbered order.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-dot">3</div><div class="step-connector"></div></div>
+        <div class="step-content">
+          <h4>Compare against applied list</h4>
+          <p>Any file whose name already appears in <code>__migrations</code> is skipped. Only new migrations run.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-dot">4</div></div>
+        <div class="step-content">
+          <h4>Apply in a transaction, record in <code>__migrations</code></h4>
+          <p>Each migration runs in its own transaction. On success the filename is inserted into <code>__migrations</code>. On failure the transaction rolls back and the app exits.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout-green" style="margin-top:1.5rem;">
+      <strong>Adding a new migration:</strong> Create a new numbered SQL file (e.g. <code>005_add_filled_at.sql</code>) in the Migrations folder, rebuild the image with <code>docker compose up --build</code>, and the runner applies it automatically on the next startup. Never edit existing migration files.
+    </div>
+
+    <h3>Migration files</h3>
+    <ul class="migration-list">
+      <li><span class="num">001</span><span class="name">create_orders.sql</span><span class="desc">orders table, indexes on account_id, symbol, status, created_at</span></li>
+      <li><span class="num">002</span><span class="name">create_outbox.sql</span><span class="desc">outbox table, indexes on status and created_at (partial — PENDING only)</span></li>
+      <li><span class="num">003</span><span class="name">create_ingestion_jobs.sql</span><span class="desc">ingestion_jobs table for tracking data pipeline runs</span></li>
+      <li><span class="num">004</span><span class="name">create_audit_log.sql</span><span class="desc">audit_log table for MCP tool call recording</span></li>
+    </ul>
+
+    <h3>Verifying applied migrations</h3>
+    <pre>docker exec -it portfolio-postgres psql -U admin -d tradeorders \
+  -c "SELECT name, applied_at FROM __migrations ORDER BY applied_at;"</pre>
+  </div>
+
+  <div class="section">
+    <h2>Outbox pattern</h2>
+    <p style="margin-bottom:1.25rem;color:#8b949e;font-size:0.875rem;">The outbox pattern ensures an order is <em>never saved without a corresponding event</em> and an event is <em>never lost even if RabbitMQ is down</em>.</p>
+
+    <div class="outbox-flow">
+      <p class="flow-label" style="margin-bottom:0.75rem;">Step 1 — Atomic write (single DB transaction)</p>
+      <div class="flow-row">
+        <span class="flow-box flow-api">POST /v1/orders</span>
+        <span class="flow-arrow">→</span>
+        <div class="tx-box">
+          <span class="tx-label">Transaction</span>
+          <span class="flow-box flow-db">INSERT INTO orders</span>
+          <span class="flow-box flow-db">INSERT INTO outbox (status=PENDING)</span>
+        </div>
+        <span class="flow-arrow">→ commit</span>
+      </div>
+
+      <p class="flow-label" style="margin: 1rem 0 0.75rem;">Step 2 — Relay (Sync background service, task #9)</p>
+      <div class="flow-row">
+        <span class="flow-box flow-db">SELECT … WHERE status='PENDING'</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-box flow-rabbit">Publish to RabbitMQ</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-box flow-db">UPDATE outbox SET status='SENT'</span>
+      </div>
+      <div class="flow-row" style="margin-top:0.5rem;">
+        <span style="font-size:0.8rem;color:#8b949e;">On publish failure: status stays PENDING, attempts++ → retried on next poll</span>
+      </div>
+    </div>
+
+    <div class="callout-green">
+      <strong>Why this matters:</strong> If RabbitMQ is unavailable when an order is created, the event sits safely in the outbox as PENDING. When RabbitMQ comes back, the relay catches up automatically — no events are dropped, no manual intervention needed.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Schema reference</h2>
+
+    <h3>orders</h3>
+    <table class="table-schema">
+      <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="pk">id</td><td>UUID</td><td class="desc">Primary key, gen_random_uuid()</td></tr>
+        <tr><td>idempotency_key</td><td>VARCHAR(128)</td><td class="desc">UNIQUE — idempotency enforcement</td></tr>
+        <tr><td>account_id</td><td>VARCHAR(64)</td><td class="desc">Client account identifier</td></tr>
+        <tr><td>symbol</td><td>VARCHAR(16)</td><td class="desc">Ticker symbol e.g. AAPL</td></tr>
+        <tr><td>side</td><td>VARCHAR(4)</td><td class="desc">CHECK IN ('BUY','SELL')</td></tr>
+        <tr><td>quantity</td><td>NUMERIC(18,8)</td><td class="desc">CHECK &gt; 0</td></tr>
+        <tr><td>price</td><td>NUMERIC(18,8)</td><td class="desc">CHECK &gt; 0</td></tr>
+        <tr><td>status</td><td>VARCHAR(16)</td><td class="desc">PENDING | FILLED | REJECTED | DEAD_LETTERED</td></tr>
+        <tr><td>created_at</td><td>TIMESTAMPTZ</td><td class="desc">DEFAULT now()</td></tr>
+        <tr><td>updated_at</td><td>TIMESTAMPTZ</td><td class="desc">DEFAULT now()</td></tr>
+      </tbody>
+    </table>
+
+    <h3>outbox</h3>
+    <table class="table-schema">
+      <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="pk">id</td><td>UUID</td><td class="desc">Primary key</td></tr>
+        <tr><td>order_id</td><td>UUID</td><td class="desc">FK → orders(id)</td></tr>
+        <tr><td>event_type</td><td>VARCHAR(64)</td><td class="desc">e.g. ORDER_CREATED</td></tr>
+        <tr><td>payload</td><td>JSONB</td><td class="desc">Order snapshot at event time</td></tr>
+        <tr><td>status</td><td>VARCHAR(16)</td><td class="desc">PENDING | SENT | FAILED</td></tr>
+        <tr><td>attempts</td><td>INT</td><td class="desc">Publish attempt count, DEFAULT 0</td></tr>
+        <tr><td>created_at</td><td>TIMESTAMPTZ</td><td class="desc">DEFAULT now()</td></tr>
+        <tr><td>sent_at</td><td>TIMESTAMPTZ</td><td class="desc">Nullable — set when SENT</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>Trade Order Service — Portfolio Project</footer>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Dev — Trade Order Service</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SFMono-Regular', Consolas, monospace; background: #161b22; padding: 0.1rem 0.35rem; border-radius: 3px; border: 1px solid #30363d; font-size: 0.85em; }
+
+  nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+  nav .brand { font-weight: 700; font-size: 1rem; color: #f0f6fc; }
+  nav .nav-links { display: flex; gap: 1.5rem; }
+  nav .nav-links a { font-size: 0.875rem; color: #8b949e; }
+  nav .nav-links a:hover { color: #c9d1d9; text-decoration: none; }
+  nav .nav-links a.active { color: #f0f6fc; }
+
+  .page-header { padding: 2.5rem 2rem 2rem; border-bottom: 1px solid #30363d; background: #161b22; }
+  .page-header h1 { font-size: 2rem; font-weight: 700; color: #f0f6fc; }
+  .page-header p { color: #8b949e; margin-top: 0.5rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+  .section { margin-bottom: 3.5rem; }
+  .section > h2 { font-size: 1.375rem; font-weight: 600; color: #f0f6fc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid #30363d; }
+  .section h3 { font-size: 1rem; font-weight: 600; color: #c9d1d9; margin: 1.5rem 0 0.75rem; }
+
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem 1.25rem; font-size: 0.8rem; overflow-x: auto; color: #c9d1d9; font-family: 'SFMono-Regular', Consolas, monospace; white-space: pre; margin: 0.75rem 0; }
+  .cmt { color: #484f58; }
+  .str { color: #a5d6ff; }
+  .grn { color: #3fb950; }
+  .ora { color: #f0883e; }
+
+  .prereqs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .prereq { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; }
+  .prereq .prereq-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .prereq h4 { font-size: 0.875rem; font-weight: 600; color: #f0f6fc; margin-bottom: 0.25rem; }
+  .prereq p { font-size: 0.8rem; color: #8b949e; }
+
+  .steps { display: flex; flex-direction: column; }
+  .step { display: flex; gap: 1rem; }
+  .step-line { display: flex; flex-direction: column; align-items: center; }
+  .step-dot { width: 32px; height: 32px; border-radius: 50%; background: #1f3a5f; border: 2px solid #58a6ff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #58a6ff; flex-shrink: 0; }
+  .step-connector { width: 2px; background: #30363d; flex: 1; min-height: 20px; margin: 4px 0; }
+  .step-content { padding: 0 0 1.5rem 0; flex: 1; }
+  .step-content h4 { font-size: 0.95rem; font-weight: 600; color: #f0f6fc; margin-bottom: 0.4rem; padding-top: 0.4rem; }
+  .step-content p { font-size: 0.875rem; color: #8b949e; }
+
+  .link-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+  .link-card .link-icon { font-size: 1.5rem; }
+  .link-card h4 { font-size: 0.9rem; font-weight: 600; color: #f0f6fc; }
+  .link-card p { font-size: 0.8rem; color: #8b949e; }
+  .link-card a { font-size: 0.875rem; }
+  .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+
+  .error-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .error-table th { background: #161b22; padding: 0.625rem 1rem; text-align: left; color: #8b949e; border: 1px solid #30363d; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .error-table td { padding: 0.75rem 1rem; border: 1px solid #30363d; vertical-align: top; }
+  .error-table tr:hover td { background: #161b22; }
+  .error-label { color: #f0883e; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.8rem; }
+
+  footer { text-align: center; padding: 2rem; border-top: 1px solid #30363d; color: #484f58; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ Trade Order Service</span>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="api.html">API Reference</a>
+    <a href="database.html">Database & Outbox</a>
+    <a href="local-dev.html" class="active">Local Dev</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Local Development</h1>
+  <p>Prerequisites, setup, and common troubleshooting.</p>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <h2>Prerequisites</h2>
+    <div class="prereqs">
+      <div class="prereq">
+        <div class="prereq-icon">🐳</div>
+        <h4>Docker Desktop</h4>
+        <p>Running with Docker Engine accessible. Required for PostgreSQL and API containers.</p>
+      </div>
+      <div class="prereq">
+        <div class="prereq-icon">⚡</div>
+        <h4>.NET 10 SDK</h4>
+        <p>For local <code>dotnet run</code> without Docker. Download from <a href="https://dotnet.microsoft.com/download">dotnet.microsoft.com</a>.</p>
+      </div>
+      <div class="prereq">
+        <div class="prereq-icon">🖥️</div>
+        <h4>PowerShell 7+</h4>
+        <p>Required to run <code>setup.ps1</code>. Included with Windows 11; install on macOS/Linux via <a href="https://github.com/PowerShell/PowerShell">GitHub</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Option A — Full Docker stack (recommended)</h2>
+    <p style="margin-bottom:1rem;color:#8b949e;font-size:0.875rem;">Runs Postgres and the API together in Docker. <code>setup.ps1</code> handles everything.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"><div class="step-dot">1</div><div class="step-connector"></div></div>
+        <div class="step-content">
+          <h4>Run the setup script</h4>
+          <pre><span class="cmt"># From repo root in PowerShell</span>
+.\setup.ps1</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-dot">2</div><div class="step-connector"></div></div>
+        <div class="step-content">
+          <h4>What the script does</h4>
+          <p>① <code>docker compose down --remove-orphans -v</code> — cleans up all containers and volumes for a fresh start<br>
+          ② <code>docker compose up -d postgres</code> — starts PostgreSQL 16<br>
+          ③ Polls <code>pg_isready</code> until the database accepts connections<br>
+          ④ <code>docker compose up -d --build api</code> — builds the .NET 10 image and starts the API (MigrationRunner applies all schema on startup)</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-dot">3</div></div>
+        <div class="step-content">
+          <h4>Verify</h4>
+          <pre><span class="cmt"># Health check</span>
+curl http://localhost:8080/health/live
+
+<span class="cmt"># Open Swagger in browser</span>
+<span class="grn">http://localhost:8080/swagger</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Option B — Local dotnet run (faster iteration)</h2>
+    <p style="margin-bottom:1rem;color:#8b949e;font-size:0.875rem;">Start only Postgres in Docker, run the API natively for fast rebuild cycles and debugger support.</p>
+    <pre><span class="cmt"># Start Postgres only</span>
+docker compose up -d postgres
+
+<span class="cmt"># Run the API locally (uses appsettings.json → Host=localhost)</span>
+dotnet run --project src/Portfolio.TradeOrderService.Api</pre>
+    <p style="margin-top:0.75rem;font-size:0.875rem;color:#8b949e;">Migrations run on startup here too — same <code>MigrationRunner</code> path.</p>
+  </div>
+
+  <div class="section">
+    <h2>Useful endpoints &amp; links</h2>
+    <div class="links-grid">
+      <div class="link-card">
+        <span class="link-icon">📖</span>
+        <div>
+          <h4>Swagger UI</h4>
+          <p>Interactive API explorer — try all endpoints in browser.</p>
+          <a href="http://localhost:8080/swagger">http://localhost:8080/swagger</a>
+        </div>
+      </div>
+      <div class="link-card">
+        <span class="link-icon">❤️</span>
+        <div>
+          <h4>Health probes</h4>
+          <p>Liveness and readiness checks for orchestration.</p>
+          <a href="http://localhost:8080/health/live">/health/live</a> &nbsp; <a href="http://localhost:8080/health/ready">/health/ready</a>
+        </div>
+      </div>
+      <div class="link-card">
+        <span class="link-icon">🗄️</span>
+        <div>
+          <h4>Verify migrations</h4>
+          <p>Query which migrations have been applied.</p>
+          <code style="font-size:0.75rem;">docker exec -it portfolio-postgres psql -U admin -d tradeorders -c "SELECT * FROM __migrations;"</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Common errors &amp; fixes</h2>
+    <table class="error-table">
+      <thead><tr><th>Error</th><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="error-label">Database is uninitialized and superuser password is not specified</span></td>
+          <td>A stale <code>postgres_data</code> volume exists from a failed previous init — Postgres won't re-read env vars on an already-initialised volume.</td>
+          <td>Run <code>.\setup.ps1</code> — it calls <code>docker compose down -v</code> to wipe the volume, then starts fresh.</td>
+        </tr>
+        <tr>
+          <td><span class="error-label">volume is in use - [container id]</span></td>
+          <td>A container is still holding the volume, preventing removal.</td>
+          <td><code>setup.ps1</code> uses <code>--remove-orphans</code> and force-removes the holding container before deleting the volume.</td>
+        </tr>
+        <tr>
+          <td><span class="error-label">NETSDK1045: does not support targeting .NET 10.0</span></td>
+          <td>Dockerfile was using the .NET 9 SDK image while projects target <code>net10.0</code>.</td>
+          <td>Dockerfile now uses <code>mcr.microsoft.com/dotnet/sdk:10.0</code> and <code>aspnet:10.0</code>. No action needed.</td>
+        </tr>
+        <tr>
+          <td><span class="error-label">addgroup: not found</span></td>
+          <td>The <code>aspnet:10.0</code> runtime image is Debian-based, not Alpine — uses <code>groupadd</code>/<code>useradd</code> not <code>addgroup</code>/<code>adduser</code>.</td>
+          <td>Dockerfile now uses <code>groupadd --system appgroup &amp;&amp; useradd --system --gid appgroup appuser</code>. No action needed.</td>
+        </tr>
+        <tr>
+          <td><span class="error-label">relation "orders" already exists</span></td>
+          <td>Postgres volume persisted tables from a previous run, but <code>__migrations</code> records were missing, so the runner tried to re-create them.</td>
+          <td>Migration SQL files now use <code>IF NOT EXISTS</code> on all <code>CREATE TABLE</code> and <code>CREATE INDEX</code> statements. No action needed.</td>
+        </tr>
+        <tr>
+          <td><span class="error-label">Connection refused 127.0.0.1:5432</span></td>
+          <td>Running <code>dotnet run</code> locally but Postgres container isn't started.</td>
+          <td>Run <code>docker compose up -d postgres</code> first, then <code>dotnet run</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>Trade Order Service — Portfolio Project</footer>
+
+</body>
+</html>
