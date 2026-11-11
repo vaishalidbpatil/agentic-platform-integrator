@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="11.0.0" />
   </ItemGroup>
 
   <PropertyGroup>

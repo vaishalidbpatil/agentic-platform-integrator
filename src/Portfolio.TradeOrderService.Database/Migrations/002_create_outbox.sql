@@ -1,4 +1,4 @@
-CREATE TABLE outbox (
+CREATE TABLE IF NOT EXISTS outbox (
     id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id        UUID            NOT NULL REFERENCES orders(id),
     event_type      VARCHAR(64)     NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE outbox (
     sent_at         TIMESTAMPTZ
 );
 
-CREATE INDEX idx_outbox_status      ON outbox (status);
-CREATE INDEX idx_outbox_created_at  ON outbox (created_at ASC) WHERE status = 'PENDING';
+CREATE INDEX IF NOT EXISTS idx_outbox_status      ON outbox (status);
+CREATE INDEX IF NOT EXISTS idx_outbox_created_at  ON outbox (created_at ASC) WHERE status = 'PENDING';
