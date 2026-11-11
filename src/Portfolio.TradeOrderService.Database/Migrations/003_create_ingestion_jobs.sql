@@ -1,4 +1,4 @@
-CREATE TABLE ingestion_jobs (
+CREATE TABLE IF NOT EXISTS ingestion_jobs (
     id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     source          VARCHAR(256)    NOT NULL,
     source_hash     VARCHAR(64)     NOT NULL,
@@ -11,5 +11,5 @@ CREATE TABLE ingestion_jobs (
     finished_at     TIMESTAMPTZ
 );
 
-CREATE INDEX idx_ingestion_jobs_status      ON ingestion_jobs (status);
-CREATE INDEX idx_ingestion_jobs_source_hash ON ingestion_jobs (source_hash);
+CREATE INDEX IF NOT EXISTS idx_ingestion_jobs_status      ON ingestion_jobs (status);
+CREATE INDEX IF NOT EXISTS idx_ingestion_jobs_source_hash ON ingestion_jobs (source_hash);
