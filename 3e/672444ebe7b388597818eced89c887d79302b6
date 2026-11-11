@@ -1,0 +1,44 @@
+src/Portfolio.TradeOrderService.Sync/appsettings.json
+  s_2897319b1316f8::t_c886f959800508 1-18
+docs/local-dev.html
+  s_2897319b1316f8::t_a4f9d6134d8e4c 1-230
+docs/architecture.html
+  s_2897319b1316f8::t_f5121a9f0c9a09 1-219
+docs/database.html
+  s_2897319b1316f8::t_0cfe7702dff4a6 1-224
+docs/api.html
+  s_2897319b1316f8::t_a86f00299e85bd 1-271
+docker-compose.yml
+  s_2897319b1316f8::t_c61894e893f60e 20-35,50-66
+  s_2897319b1316f8::t_45679069ff82f8 67
+src/Portfolio.TradeOrderService.Configuration/RabbitMqOptions.cs
+  s_2897319b1316f8::t_a5b1705e27d4f9 1-12
+src/Portfolio.TradeOrderService.Sync/Program.cs
+  s_2897319b1316f8::t_412fde94cd7b94 1-23
+src/Portfolio.TradeOrderService.Sync/OutboxRelay.cs
+  s_2897319b1316f8::t_5225792cc0e6dc 1-185
+src/Portfolio.TradeOrderService.Sync/Portfolio.TradeOrderService.Sync.csproj
+  s_2897319b1316f8::t_84f295fb72b684 1,7,10-20
+src/Portfolio.TradeOrderService.Sync/Dockerfile
+  s_2897319b1316f8::t_39a3e53ef7b447 1-25
+README.md
+  s_2897319b1316f8::t_87be65bd943107 3,5,7-10,12,18
+docs/index.html
+  s_2897319b1316f8::t_ed20ea638935bf 1-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3e672444ebe7b388597818eced89c887d79302b6",
+  "prompts": {},
+  "sessions": {
+    "s_2897319b1316f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "125ae5a3-03b1-4e8b-97a1-9298d99cd8b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
