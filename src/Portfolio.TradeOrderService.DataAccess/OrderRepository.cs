@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Npgsql;
 using Portfolio.TradeOrderService.Configuration;
 using Portfolio.TradeOrderService.Models;
@@ -85,26 +86,57 @@ public class OrderRepository : IOrderRepository
     {
         await using var conn = new NpgsqlConnection(_options.ConnectionString);
         await conn.OpenAsync();
-        await using var cmd = new NpgsqlCommand("""
+        await using var tx = await conn.BeginTransactionAsync();
+
+        // Insert order
+        await using var orderCmd = new NpgsqlCommand("""
             INSERT INTO orders (id, idempotency_key, account_id, symbol, side, quantity, price, status, created_at, updated_at)
             VALUES (@id, @key, @accountId, @symbol, @side, @quantity, @price, @status, @createdAt, @updatedAt)
             RETURNING *
-            """, conn);
+            """, conn, tx);
 
-        cmd.Parameters.AddWithValue("id", order.Id);
-        cmd.Parameters.AddWithValue("key", order.IdempotencyKey);
-        cmd.Parameters.AddWithValue("accountId", order.AccountId);
-        cmd.Parameters.AddWithValue("symbol", order.Symbol);
-        cmd.Parameters.AddWithValue("side", order.Side.ToString());
-        cmd.Parameters.AddWithValue("quantity", order.Quantity);
-        cmd.Parameters.AddWithValue("price", order.Price);
-        cmd.Parameters.AddWithValue("status", order.Status.ToString());
-        cmd.Parameters.AddWithValue("createdAt", order.CreatedAt);
-        cmd.Parameters.AddWithValue("updatedAt", order.UpdatedAt);
+        orderCmd.Parameters.AddWithValue("id", order.Id);
+        orderCmd.Parameters.AddWithValue("key", order.IdempotencyKey);
+        orderCmd.Parameters.AddWithValue("accountId", order.AccountId);
+        orderCmd.Parameters.AddWithValue("symbol", order.Symbol);
+        orderCmd.Parameters.AddWithValue("side", order.Side.ToString());
+        orderCmd.Parameters.AddWithValue("quantity", order.Quantity);
+        orderCmd.Parameters.AddWithValue("price", order.Price);
+        orderCmd.Parameters.AddWithValue("status", order.Status.ToString());
+        orderCmd.Parameters.AddWithValue("createdAt", order.CreatedAt);
+        orderCmd.Parameters.AddWithValue("updatedAt", order.UpdatedAt);
 
-        await using var reader = await cmd.ExecuteReaderAsync();
+        await using var reader = await orderCmd.ExecuteReaderAsync();
         await reader.ReadAsync();
-        return MapOrder(reader);
+        var created = MapOrder(reader);
+        await reader.CloseAsync();
+
+        // Write outbox event in the same transaction — atomically guaranteed
+        var payload = JsonSerializer.Serialize(new
+        {
+            created.Id,
+            created.AccountId,
+            created.Symbol,
+            created.Side,
+            created.Quantity,
+            created.Price,
+            created.Status,
+            created.CreatedAt
+        });
+
+        await using var outboxCmd = new NpgsqlCommand("""
+            INSERT INTO outbox (order_id, event_type, payload)
+            VALUES (@orderId, @eventType, @payload::jsonb)
+            """, conn, tx);
+
+        outboxCmd.Parameters.AddWithValue("orderId", created.Id);
+        outboxCmd.Parameters.AddWithValue("eventType", "ORDER_CREATED");
+        outboxCmd.Parameters.AddWithValue("payload", payload);
+
+        await outboxCmd.ExecuteNonQueryAsync();
+        await tx.CommitAsync();
+
+        return created;
     }
 
     private static Order MapOrder(NpgsqlDataReader r) => new()
