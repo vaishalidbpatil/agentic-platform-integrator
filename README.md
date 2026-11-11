@@ -47,12 +47,13 @@ The solution follows a layered architecture. Each project has a single responsib
 
 ```
 src/
-├── Portfolio.TradeOrderService.Api               # HTTP server
+├── Portfolio.TradeOrderService.Api               # Orders REST API host
+├── Portfolio.TradeOrderService.McpServer         # MCP tool server (4 tools)
 ├── Portfolio.TradeOrderService.ServiceInterfaces # Service contracts
 ├── Portfolio.TradeOrderService.Services          # Business logic
 ├── Portfolio.TradeOrderService.Sync              # Outbox → RabbitMQ publisher
 ├── Portfolio.TradeOrderService.Models            # Domain models and DTOs
-├── Portfolio.TradeOrderService.Database          # DB connection and migration runner
+├── Portfolio.TradeOrderService.Database          # Migration runner + SQL schema
 ├── Portfolio.TradeOrderService.DataAccess        # Repositories
 ├── Portfolio.TradeOrderService.Configuration     # Strongly-typed config classes
 └── Portfolio.TradeOrderService.Client            # Typed HTTP client SDK
@@ -63,11 +64,12 @@ src/
 | Project | Responsibility |
 |---|---|
 | **Api** | ASP.NET Core host. Controllers, middleware, DI registration, health endpoints, rate limiting. Entry point for all HTTP traffic. |
+| **McpServer** | Standalone MCP tool server exposing 4 tools: `get_order_status`, `list_recent_orders`, `get_data_quality_report`, `replay_dead_letter_message`. Read-only by default with approval gate and audit log. |
 | **ServiceInterfaces** | Contracts only — `IOrderService`, `IIngestionService`, etc. No implementations. Allows the Api to depend on abstractions. |
 | **Services** | Implementations of the service interfaces. Contains all business logic: order validation, idempotency checks, status transitions. |
 | **Sync** | Background service that reads the outbox table and publishes `OrderPlaced` events to RabbitMQ. Decouples DB writes from message publishing. |
 | **Models** | Shared domain models (`Order`, `OutboxMessage`, `IngestionJob`), DTOs, enums, and request/response contracts. No dependencies. |
-| **Database** | Database connection factory, migration runner, and schema versioning. No business logic. |
+| **Database** | Migration runner and embedded SQL schema files. Runs all unapplied migrations on startup. Tracks applied migrations in `__migrations` table. |
 | **DataAccess** | Repository implementations (`OrderRepository`, `OutboxRepository`, etc.). All SQL lives here. Depends on Models and Database. |
 | **Configuration** | Strongly-typed option classes (`DatabaseOptions`, `RabbitMqOptions`, `S3Options`). Bound from `appsettings.json` at startup. |
 | **Client** | Typed `HttpClient` wrapper for external consumers of the Orders API. Shares Models so request/response types are consistent. |
@@ -83,27 +85,30 @@ Database → DataAccess
               ↓
 ServiceInterfaces → Services
                        ↓
-         Sync    Client    Api
+    Sync    Client    Api    McpServer
 ```
 
 ---
 
 ## Database Migrations
 
-Plain SQL migration files run in order:
+Plain SQL migration files live inside the Database project as embedded resources and run automatically on API startup:
 
 ```
-db/migrations/
+src/Portfolio.TradeOrderService.Database/Migrations/
 ├── 001_create_orders.sql
 ├── 002_create_outbox.sql
 ├── 003_create_ingestion_jobs.sql
 └── 004_create_audit_log.sql
 ```
 
-Run via the setup script:
+The `MigrationRunner` applies each file in order and records it in a `__migrations` table — already-applied migrations are skipped on subsequent startups.
+
+To start Postgres and run the API (which triggers migrations):
 
 ```powershell
 .\setup.ps1
+dotnet run --project src/Portfolio.TradeOrderService.Api
 ```
 
 ---
