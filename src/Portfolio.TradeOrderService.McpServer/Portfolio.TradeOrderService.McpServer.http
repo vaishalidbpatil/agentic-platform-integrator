@@ -1,0 +1,6 @@
+@Portfolio.TradeOrderService.McpServer_HostAddress = http://localhost:5031
+
+GET {{Portfolio.TradeOrderService.McpServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

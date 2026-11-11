@@ -5,6 +5,7 @@
     <Project Path="src/Portfolio.TradeOrderService.Configuration/Portfolio.TradeOrderService.Configuration.csproj" />
     <Project Path="src/Portfolio.TradeOrderService.DataAccess/Portfolio.TradeOrderService.DataAccess.csproj" />
     <Project Path="src/Portfolio.TradeOrderService.Database/Portfolio.TradeOrderService.Database.csproj" />
+    <Project Path="src/Portfolio.TradeOrderService.McpServer/Portfolio.TradeOrderService.McpServer.csproj" />
     <Project Path="src/Portfolio.TradeOrderService.Models/Portfolio.TradeOrderService.Models.csproj" />
     <Project Path="src/Portfolio.TradeOrderService.ServiceInterfaces/Portfolio.TradeOrderService.ServiceInterfaces.csproj" />
     <Project Path="src/Portfolio.TradeOrderService.Services/Portfolio.TradeOrderService.Services.csproj" />
