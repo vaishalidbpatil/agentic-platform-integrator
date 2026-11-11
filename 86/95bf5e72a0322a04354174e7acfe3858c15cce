@@ -1,0 +1,19 @@
+setup.ps1
+  s_2897319b1316f8::t_4680c9a6732d32 3-5,11-23,56-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8695bf5e72a0322a04354174e7acfe3858c15cce",
+  "prompts": {},
+  "sessions": {
+    "s_2897319b1316f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "125ae5a3-03b1-4e8b-97a1-9298d99cd8b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
