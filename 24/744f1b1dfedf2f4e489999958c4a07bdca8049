@@ -1,0 +1,20 @@
+src/Portfolio.TradeOrderService.DataAccess/OrderRepository.cs
+  s_2897319b1316f8::t_1b30e25013fc28 89-92,96-109,111-139
+  s_2897319b1316f8::t_eba86ce6fc5029 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "24744f1b1dfedf2f4e489999958c4a07bdca8049",
+  "prompts": {},
+  "sessions": {
+    "s_2897319b1316f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "125ae5a3-03b1-4e8b-97a1-9298d99cd8b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "vaishali.patil <vaishali.patil@coupa.com>"
+    }
+  }
+}
